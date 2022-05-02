@@ -88,6 +88,28 @@ impl SinkController {
             ControllerError::GetInfo("Error getting information about the server".to_string())
         })
     }
+
+    // Sink Name, Port Name
+    pub fn set_port_by_name(&mut self, name: &str, port: &str) -> Result<bool, ControllerError> {
+        let op = self
+            .handler
+            .context
+            .borrow_mut()
+            .introspect()
+            .set_sink_port_by_name(name, port, None);
+        self.handler.wait_for_operation(op).ok();
+        Ok(true)
+    }
+    // Sink Index, Port Name
+    pub fn set_port_by_index(&mut self, index: u32, port: &str) {
+        let op = self
+            .handler
+            .context
+            .borrow_mut()
+            .introspect()
+            .set_sink_port_by_index(index, port, None);
+        self.handler.wait_for_operation(op).ok();
+    }
 }
 
 impl DeviceControl<DeviceInfo> for SinkController {
@@ -129,6 +151,7 @@ impl DeviceControl<DeviceInfo> for SinkController {
             .take()
             .ok_or_else(|| ControllerError::GetInfo("Error getting device list".to_string()))
     }
+
     fn get_device_by_index(&mut self, index: u32) -> Result<DeviceInfo, ControllerError> {
         let device = Rc::new(RefCell::new(Some(None)));
         let dev_ref = device.clone();
